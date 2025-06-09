@@ -1,10 +1,10 @@
 from aiogram.types import CallbackQuery
-from databese.models import User
+from databese.models import User, Profile
 from databese.settings import get_db
 from settings.logging_config import configure_logging
 import logging
 from sqlalchemy import select
-from keyboards.profile_keyboard import get_profile_keyboard
+from keyboards.profile_keyboard import get_profile_keyboard, get_create_profile_keyboard
 
 
 
@@ -14,24 +14,42 @@ logger = logging.getLogger(__name__)
 
 
 async def profile_handler(callback: CallbackQuery):
-    
-    #TODO add data from profile after completion
-
-    async for sessoin in get_db():
+    async for session in get_db():
         try:
-            result = await sessoin.execute(select(User).where(User.tg_user_id == callback.from_user.id))
-            user = result.scalar()
+            user = await User.get_user(tg_user_id=callback.from_user.id, session=session)
             
             if user:
+                profile = await Profile.get_user_profile(session=session, user_id=user.id)
+                experience = f"{profile.user_experience} years" if profile.user_experience else "Not specified"
+                languages = profile.user_languages if profile.user_languages else "Not specified"
+                hard_skills = profile.hard_skills if profile.hard_skills else "Not specified"
+                soft_skills = profile.soft_skills if profile.soft_skills else "Not specified"
+                education = profile.education if profile.education else "Not specified"
+                projects = profile.projects if profile.projects else "Not specified"
+                github = profile.user_git_hub if profile.user_git_hub else "Not specified"
+                linkedin = profile.user_linkedin if profile.user_linkedin else "Not specified"
+
                 profile_message = (
-                    f"👤 <b>User Profile</b>\n\n"
-                    f"<b>Username:</b> {user.tg_user_name}\n"
-                    f"<b>Email:</b> @{user.user_login}\n\n"
-                    f"<b>Profile Created:</b> {user.created_at.strftime('%Y-%m-%d %H:%M')}"
+                    f"👤 <b>Professional Profile</b>\n\n"
+                    f"<b>Basic Information:</b>\n"
+                    f"• Username: {user.tg_user_name}\n"
+                    f"• Email: {user.user_login}\n"
+                    f"• Profile Created: {user.created_at.strftime('%Y-%m-%d %H:%M')}\n\n"
+                    f"<b>Professional Details:</b>\n"
+                    f"• Experience: {experience}\n"
+                    f"• Languages: {languages}\n"
+                    f"• Hard Skills: {hard_skills}\n"
+                    f"• Soft Skills: {soft_skills}\n"
+                    f"• Education: {education}\n"
+                    f"• Projects: {projects}\n\n"
+                    f"<b>Professional Links:</b>\n"
+                    f"• GitHub: {github}\n"
+                    f"• LinkedIn: {linkedin}"
                 )
+                
                 await callback.message.answer(
                     text=profile_message,
-                    reply_markup=get_profile_keyboard(),
+                    reply_markup=get_create_profile_keyboard(),
                     parse_mode="HTML"
                 )
             else:

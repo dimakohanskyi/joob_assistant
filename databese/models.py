@@ -23,6 +23,10 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+    profile = relationship("Profile", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    jobb_items = relationship("Jobb", back_populates="user", cascade="all, delete-orphan")
+
+
     @classmethod
     async def create_new_user(cls, tg_user_id: int, tg_user_name: str, session):
         try:
@@ -70,6 +74,8 @@ class Profile(Base):
     education = Column(JSONB)
     projects = Column(JSONB)
 
+    user = relationship("User", back_populates="profile")
+
 
     @classmethod
     async def update_profile(cls, user_id: int, update_data: dict, session):
@@ -94,19 +100,49 @@ class Profile(Base):
             return None
 
 
+    @classmethod
+    async def get_user_profile(cls, session, user_id: int):
+        try:
+            result = await session.execute(select(cls).where(cls.user_id == user_id))
+            profile = result.scalar()
+            if not profile:
+                logging.error(f"Error with geting user profile for user with id - {user_id}")
+                return
+            return profile
+        except Exception as ex:
+            logging.error(f"Error geting user profile for user with id - {user_id}")
+                
 
 
 
+        
 
 class Jobb:
-    __tablename__ = "jobb_sheet"
+    __tablename__ = "jobb_items"
 
     id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("user.id"))
+    priority = Column(Enum('high', 'medium', 'low', name="jobb_priority"), default="low")
     url = Column(String(2048))
     status = Column(Enum('applied', 'waiting_response', 'rejected', 'interview_1', 'interview_2', 'offer', name='job_status'), default='')
     ai_summary = Column(Text)
     additional_info = Column(JSONB)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", back_populates="jobb_items")
+
+
+    @classmethod
+    async def add_jobb_item(cls, user_id, session):
+        ...
+
+
+    @staticmethod
+    async def get_jobb_items(user_id, session):
+        ...
+
+
+
 
 
 

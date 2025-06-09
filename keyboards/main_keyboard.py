@@ -4,8 +4,12 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 def get_main_menu():
     """Main menu keyboard with primary options"""
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="👤 User Profile", callback_data="profile")],
-        [InlineKeyboardButton(text="👤 Create Profile", callback_data="create_profile")],
+        [InlineKeyboardButton(text="👤 Profile", callback_data="profile")],
+        [InlineKeyboardButton(text="➕ Create Profile", callback_data="create_account")],
+        [InlineKeyboardButton(text="📝 Add Job", callback_data="add_joob_item")],
+        [InlineKeyboardButton(text="📊 Job Analysis", callback_data="add_joob_item")],
+        [InlineKeyboardButton(text="✉️ Create Custom Cover Letter", callback_data="add_joob_item")],
+        [InlineKeyboardButton(text="📋 Jobb Items Sheet", callback_data="add_joob_item")],
     ])
     return keyboard
 
