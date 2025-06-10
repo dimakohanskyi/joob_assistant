@@ -117,7 +117,7 @@ class Profile(Base):
 
         
 
-class Jobb:
+class Jobb(Base):
     __tablename__ = "jobb_items"
 
     id = Column(Integer, primary_key=True, index=True)

@@ -5,7 +5,7 @@ from settings.logging_config import configure_logging
 import logging
 from sqlalchemy import select
 from keyboards.profile_keyboard import get_create_profile_keyboard
-from states.email_state import EmailState
+from states.profile_states.email_state import EmailState
 from aiogram.fsm.context import FSMContext
 import re
 

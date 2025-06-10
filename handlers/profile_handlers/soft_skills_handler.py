@@ -5,7 +5,7 @@ from settings.logging_config import configure_logging
 import logging
 from sqlalchemy import select
 from keyboards.profile_keyboard import get_profile_keyboard
-from states.soft_skills_state import SoftSkillsState
+from states.profile_states.soft_skills_state import SoftSkillsState
 from aiogram.fsm.context import FSMContext
 
 

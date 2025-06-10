@@ -17,18 +17,20 @@ from handlers.profile_handlers.projects_handler import add_projects, process_add
 from handlers.profile_handlers.git_hub_handler import add_github, process_adding_github
 from handlers.profile_handlers.linkedin_handler import add_linkedin, process_adding_linkedin
 from handlers.profile_handlers.email_handler import add_email, process_adding_email
+from handlers.job_handlers.get_job_item_analyse import job_analyse_handler, process_job_url
 
 from handlers.menu_handler import main_menu_handler
 
-from states.experience_state import ExperienceState
-from states.hard_skills_state import HardSkillsState
-from states.soft_skills_state import SoftSkillsState
-from states.education_state import EducationState
-from states.languages_state import LanguagesState
-from states.projects_state import ProjectsState
-from states.git_hub_state import GitHubState
-from states.linkedin_state import LinkedInState
-from states.email_state import EmailState
+from states.profile_states.experience_state import ExperienceState
+from states.profile_states.hard_skills_state import HardSkillsState
+from states.profile_states.soft_skills_state import SoftSkillsState
+from states.profile_states.education_state import EducationState
+from states.profile_states.languages_state import LanguagesState
+from states.profile_states.projects_state import ProjectsState
+from states.profile_states.git_hub_state import GitHubState
+from states.profile_states.linkedin_state import LinkedInState
+from states.profile_states.email_state import EmailState
+from states.job_states.job_analyse_state import JobAnalyseState
 
 
 
@@ -84,6 +86,11 @@ router.message.register(
     StateFilter(EmailState.waiting_for_email, EmailState.waiting_for_update_confirmation)
 )
 
+router.message.register(
+    process_job_url,
+    StateFilter(JobAnalyseState.waiting_for_url)
+)
+
 
 
 
@@ -116,6 +123,8 @@ async def handle_callback(callback_query: CallbackQuery, state: FSMContext):
             await add_linkedin(callback_query, state)
         elif command == "profile_email":
             await add_email(callback_query, state)
+        elif command == "analyse_job_item":
+            await job_analyse_handler(callback_query, state)
 
 
     except Exception as ex:

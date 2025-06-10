@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y curl && \
     curl -sSL https://install.python-poetry.org | python3 - && \
     ln -s /root/.local/bin/poetry /usr/local/bin/poetry && \
     poetry config virtualenvs.create false && \
-    poetry install
+    poetry install --no-interaction --no-ansi
 
 
 CMD ["poetry", "run", "python3", "main.py"]

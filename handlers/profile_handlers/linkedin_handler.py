@@ -5,7 +5,7 @@ from settings.logging_config import configure_logging
 import logging
 from sqlalchemy import select
 from keyboards.profile_keyboard import get_create_profile_keyboard
-from states.linkedin_state import LinkedInState
+from states.profile_states.linkedin_state import LinkedInState
 from aiogram.fsm.context import FSMContext
 import re
 
