@@ -6,10 +6,10 @@ def get_main_menu():
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="👤 Profile", callback_data="profile")],
         [InlineKeyboardButton(text="➕ Create Profile", callback_data="create_account")],
-        [InlineKeyboardButton(text="📝 Add Job", callback_data="add_joob_item")],
+        [InlineKeyboardButton(text="📝 Add Job", callback_data="job_keyboard")],
+        [InlineKeyboardButton(text="📋 My Job Applications", callback_data="show_jobs")],
         [InlineKeyboardButton(text="📊 Job Analysis", callback_data="analyse_job_item")],
         [InlineKeyboardButton(text="✉️ Create Custom Cover Letter", callback_data="add_joob_item")],
-        [InlineKeyboardButton(text="📋 Jobb Items Sheet", callback_data="add_joob_item")],
     ])
     return keyboard
 

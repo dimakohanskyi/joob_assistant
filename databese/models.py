@@ -124,7 +124,7 @@ class Jobb(Base):
     user_id = Column(Integer, ForeignKey("user.id"))
     priority = Column(Enum('high', 'medium', 'low', name="jobb_priority"), default="low")
     url = Column(String(2048))
-    status = Column(Enum('applied', 'waiting_response', 'rejected', 'interview_1', 'interview_2', 'offer', name='job_status'), default='')
+    status = Column(Enum('applied', 'waiting_response', 'rejected', 'interview_1', 'interview_2', 'offer', name='job_status'), default='applied')
     ai_summary = Column(Text)
     additional_info = Column(JSONB)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -132,14 +132,18 @@ class Jobb(Base):
     user = relationship("User", back_populates="jobb_items")
 
 
-    @classmethod
-    async def add_jobb_item(cls, user_id, session):
-        ...
-
 
     @staticmethod
     async def get_jobb_items(user_id, session):
-        ...
+        try:
+            result = await session.execute(select(Jobb).where(Jobb.user_id == user_id))
+            user_job_item = result.scalar()
+            if not user_job_item:
+                logging.error("Error with getting user_job_item")
+                return 
+            return user_job_item
+        except Exception as ex:
+            logging.error("error with getting data from Jobb model")
 
 
 

@@ -1,7 +1,7 @@
 import logging
 from aiogram import Router
 from aiogram.filters import CommandStart, StateFilter
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
 
 from settings.logging_config import configure_logging
@@ -18,8 +18,12 @@ from handlers.profile_handlers.git_hub_handler import add_github, process_adding
 from handlers.profile_handlers.linkedin_handler import add_linkedin, process_adding_linkedin
 from handlers.profile_handlers.email_handler import add_email, process_adding_email
 from handlers.job_handlers.get_job_item_analyse import job_analyse_handler, process_job_url
+from handlers.job_handlers.add_job_url import add_job_item_url, process_job_item_url
+from handlers.job_handlers.set_job_item_status import set_job_item_status
+from handlers.job_handlers.show_job_items import show_job_items
 
-from handlers.menu_handler import main_menu_handler
+
+from handlers.menu_handler import main_menu_handler, get_add_menu_handler
 
 from states.profile_states.experience_state import ExperienceState
 from states.profile_states.hard_skills_state import HardSkillsState
@@ -31,6 +35,7 @@ from states.profile_states.git_hub_state import GitHubState
 from states.profile_states.linkedin_state import LinkedInState
 from states.profile_states.email_state import EmailState
 from states.job_states.job_analyse_state import JobAnalyseState
+from states.job_states.job_item_url_state import JobUrlState
 
 
 
@@ -91,6 +96,11 @@ router.message.register(
     StateFilter(JobAnalyseState.waiting_for_url)
 )
 
+router.message.register(
+    process_job_item_url,
+    StateFilter(JobUrlState.waiting_for_item_url)
+)
+
 
 
 
@@ -105,6 +115,8 @@ async def handle_callback(callback_query: CallbackQuery, state: FSMContext):
             await create_account(callback_query)
         elif command == "main_menu":
             await main_menu_handler(callback_query)
+        elif command == "job_keyboard":
+            await get_add_menu_handler(callback_query)
         elif command == "add_user_experience":
             await add_user_experience(callback_query, state)
         elif command == "profile_hard_skills":
@@ -125,7 +137,26 @@ async def handle_callback(callback_query: CallbackQuery, state: FSMContext):
             await add_email(callback_query, state)
         elif command == "analyse_job_item":
             await job_analyse_handler(callback_query, state)
+        elif command == "add_job_url":
+            await add_job_item_url(callback_query, state)
+        elif command == "add_job_status":
+            await set_job_item_status(callback_query)
 
+        elif command == "show_jobs":
+            await show_job_items(callback_query)
+
+
+
+        # elif command.startswith("show_job_"):
+        #     await show_job_item_details(callback_query)
+        # elif command.startswith("change_status_"):
+        #     await show_status_update(callback_query)
+        # elif command.startswith("change_priority_"):
+        #     await show_priority_update(callback_query)
+        # elif command.startswith("set_status_"):
+        #     await update_job_status(callback_query)
+        # elif command.startswith("set_priority_"):
+        #     await update_job_priority(callback_query)
 
     except Exception as ex:
         logger.error(f"Error executing command - {command}")

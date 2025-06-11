@@ -24,7 +24,6 @@ async def job_analyse_handler(callback: CallbackQuery, state: FSMContext):
 
 
 
-
 async def process_job_url(message: Message, state: FSMContext):
     url = message.text.strip()
     
