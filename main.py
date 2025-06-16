@@ -3,8 +3,9 @@ import os
 import logging
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher
-from routes.routes import router
-from settings.logging_config import configure_logging
+from src.routes.routes import router
+from src.settings.logging_config import configure_logging
+
 
 configure_logging()
 load_dotenv()
