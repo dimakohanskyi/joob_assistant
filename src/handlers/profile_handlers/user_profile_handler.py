@@ -1,17 +1,14 @@
 from aiogram.types import CallbackQuery
+import logging
+
 from src.databese.models import User, Profile
 from src.databese.settings import get_db
 from src.settings.logging_config import configure_logging
-import logging
-from sqlalchemy import select
 from src.keyboards.profile_keyboard import get_create_profile_keyboard
-from src.keyboards.main_keyboard import get_main_menu
-
 
 
 configure_logging()
 logger = logging.getLogger(__name__)
-
 
 
 async def profile_handler(callback: CallbackQuery):

@@ -1,13 +1,15 @@
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, FSInputFile, InputMediaDocument
+from aiogram.fsm.context import FSMContext
+import logging
+import os
+
 from src.keyboards.profile_keyboard import get_profile_keyboard
 from src.ai_analyse.job_item_analyse import analyse_job_url
-from aiogram.fsm.context import FSMContext
 from src.states.job_states.job_analyse_state import JobAnalyseState
 from src.settings.logging_config import configure_logging
-import logging
 from src.utils.valid_url_checker import is_valid_url
-from src.databese.settings import get_db
-from sqlalchemy import select
+from src.utils.report_generator import pack_job_analyse_report
+
 
 
 
@@ -30,7 +32,6 @@ async def job_analyse_handler(callback: CallbackQuery, state: FSMContext):
 
 async def process_job_url(message: Message, state: FSMContext):
     url = message.text.strip()
-    # Delete user's message with URL
     await message.delete()
     
     state_data = await state.get_data()
@@ -45,7 +46,6 @@ async def process_job_url(message: Message, state: FSMContext):
         )
         return
 
-    # Update the bot's message to show processing
     await message.bot.edit_message_caption(
         chat_id=message.chat.id,
         message_id=last_bot_message_id,
@@ -53,21 +53,51 @@ async def process_job_url(message: Message, state: FSMContext):
         reply_markup=get_profile_keyboard()
     )
     
-    analysis_result = await analyse_job_url(url)
-    if not analysis_result:
+    try:
+        analysis_result = await analyse_job_url(url)
+        if not analysis_result:
+            await message.bot.edit_message_caption(
+                chat_id=message.chat.id,
+                message_id=last_bot_message_id,
+                caption="❌ Sorry, I couldn't analyze this job posting. Please make sure the URL is correct and try again.",
+                reply_markup=get_profile_keyboard()
+            )
+            return
+
+        file_path = pack_job_analyse_report(analysis_result)
+        
+        try:
+            await message.bot.edit_message_media(
+                chat_id=message.chat.id,
+                message_id=last_bot_message_id,
+                media=InputMediaDocument(
+                    media=FSInputFile(file_path),
+                    caption="✅ Here's your job analysis report"
+                ),
+                reply_markup=get_profile_keyboard()
+            )
+        finally:
+            try:
+                os.remove(file_path)
+                logger.info(f"Temporary file {file_path} has been deleted")
+            except Exception as e:
+                logger.error(f"Error deleting temporary file {file_path}: {str(e)}")
+        
         await message.bot.edit_message_caption(
             chat_id=message.chat.id,
             message_id=last_bot_message_id,
-            caption="❌ Sorry, I couldn't analyze this job posting. Please make sure the URL is correct and try again.",
+            caption="✅ Analysis complete! I've sent you the report as a file.",
             reply_markup=get_profile_keyboard()
         )
-        return
-
-    await message.bot.edit_message_caption(
-        chat_id=message.chat.id,
-        message_id=last_bot_message_id,
-        caption=f"✅ Job Analysis Results:\n\n{analysis_result}",
-        reply_markup=get_profile_keyboard()
-    )
+        
+    except Exception as e:
+        logger.error(f"Error processing job URL: {str(e)}")
+        await message.bot.edit_message_caption(
+            chat_id=message.chat.id,
+            message_id=last_bot_message_id,
+            caption="❌ An error occurred while processing your request. Please try again.",
+            reply_markup=get_profile_keyboard()
+        )
+    
     await state.clear()
 

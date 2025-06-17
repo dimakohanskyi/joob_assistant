@@ -1,22 +1,24 @@
 import logging
 from aiogram import Router
 from aiogram.filters import CommandStart, StateFilter
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.context import FSMContext
 
 from src.settings.logging_config import configure_logging
 from src.handlers.start_handler import start_handler
+
 from src.handlers.profile_handlers.user_profile_handler import profile_handler
 from src.handlers.profile_handlers.create_profile import create_account
 from src.handlers.profile_handlers.experience_handler import add_experience, process_adding_experience, process_experience_confirmation
-from src.handlers.profile_handlers.hard_skills_handler import add_hard_skills, process_adding_hard_skills
-from src.handlers.profile_handlers.soft_skills_handler import add_soft_skills, process_adding_soft_skills
-from src.handlers.profile_handlers.education_handler import add_education, process_adding_education
-from src.handlers.profile_handlers.languages_handler import add_languages, process_adding_languages
-from src.handlers.profile_handlers.projects_handler import add_projects, process_adding_projects
-from src.handlers.profile_handlers.git_hub_handler import add_github, process_adding_github
-from src.handlers.profile_handlers.linkedin_handler import add_linkedin, process_adding_linkedin
-from src.handlers.profile_handlers.email_handler import add_email, process_adding_email
+from src.handlers.profile_handlers.hard_skills_handler import add_hard_skills, process_adding_hard_skills, process_hard_skills_confirmation
+from src.handlers.profile_handlers.soft_skills_handler import add_soft_skills, process_adding_soft_skills, process_soft_skills_confirmation
+from src.handlers.profile_handlers.education_handler import add_education, process_adding_education, process_education_confirmation
+from src.handlers.profile_handlers.languages_handler import add_languages, process_adding_languages, process_languages_confirmation
+from src.handlers.profile_handlers.projects_handler import add_projects, process_adding_projects, process_projects_confirmation
+from src.handlers.profile_handlers.git_hub_handler import add_github, process_adding_github, process_github_confirmation
+from src.handlers.profile_handlers.linkedin_handler import add_linkedin, process_adding_linkedin, process_linkedin_confirmation
+from src.handlers.profile_handlers.email_handler import add_email, process_adding_email, process_email_confirmation
+
 from src.handlers.job_handlers.get_job_item_analyse import job_analyse_handler, process_job_url
 from src.handlers.job_handlers.add_job_url import add_job_item_url, process_job_item_url
 from src.handlers.job_handlers.show_job_items import show_job_items
@@ -30,8 +32,9 @@ from src.handlers.job_handlers.get_update_job_handler import (
     update_job_item_handler,
     process_get_job_item_info
 )
+from src.handlers.job_handlers.job_ai_summary_handler import job_ai_summary_handler
 
-from src.handlers.menu_handler import main_menu_handler, get_add_menu_handler
+from src.handlers.menu_handler import main_menu_handler
 
 from src.states.profile_states.experience_state import ExperienceState
 from src.states.profile_states.hard_skills_state import HardSkillsState
@@ -46,22 +49,24 @@ from src.states.job_states.job_analyse_state import JobAnalyseState
 from src.states.job_states.job_item_url_state import JobUrlState
 from src.states.job_states.job_get_update_state import JobGetUpdateState
 
+
 configure_logging()
 logger = logging.getLogger(__name__)
 
+
 router = Router()
 
-# Basic command handlers
 router.message.register(start_handler, CommandStart())
 
-# Profile state handlers
+
+
 router.message.register(
     process_adding_experience,
     StateFilter(ExperienceState.waiting_for_experience)
 )
 router.message.register(
     process_adding_hard_skills,
-    StateFilter(HardSkillsState.waiting_for_hard_skills, HardSkillsState.waiting_for_update_confirmation)
+    StateFilter(HardSkillsState.waiting_for_hard_skills)
 )
 router.message.register(
     process_adding_soft_skills,
@@ -123,28 +128,42 @@ async def handle_callback(callback_query: CallbackQuery, state: FSMContext):
             await create_account(callback_query)
         elif command == "main_menu":
             await main_menu_handler(callback_query)
-        elif command == "job_keyboard":
-            await get_add_menu_handler(callback_query)
         elif command == "add_user_experience":
             await add_experience(callback_query, state)
         elif command in ["confirm_experience_update", "cancel_experience_update", "create_profile"]:
             await process_experience_confirmation(callback_query, state)
         elif command == "profile_hard_skills":
             await add_hard_skills(callback_query, state)
+        elif command in ["confirm_hard_skills_update", "cancel_hard_skills_update", "create_profile"]:
+            await process_hard_skills_confirmation(callback_query, state)
         elif command == "profile_soft_skills":
             await add_soft_skills(callback_query, state)
+        elif command in ["confirm_soft_skills_update", "cancel_soft_skills_update"]:
+            await process_soft_skills_confirmation(callback_query, state)
         elif command == "profile_education":
             await add_education(callback_query, state)
+        elif command in ["confirm_education_update", "cancel_education_update"]:
+            await process_education_confirmation(callback_query, state)
         elif command == "profile_languages":
             await add_languages(callback_query, state)
+        elif command in ["confirm_languages_update", "cancel_languages_update"]:
+            await process_languages_confirmation(callback_query, state)
         elif command == "profile_projects":
             await add_projects(callback_query, state)
+        elif command in ["confirm_projects_update", "cancel_projects_update"]:
+            await process_projects_confirmation(callback_query, state)
         elif command == "profile_github":
             await add_github(callback_query, state)
+        elif command in ["confirm_github_update", "cancel_github_update"]:
+            await process_github_confirmation(callback_query, state)
         elif command == "profile_linkedin":
             await add_linkedin(callback_query, state)
+        elif command in ["confirm_linkedin_update", "cancel_linkedin_update"]:
+            await process_linkedin_confirmation(callback_query, state)
         elif command == "profile_email":
             await add_email(callback_query, state)
+        elif command in ["confirm_email_update", "cancel_email_update"]:
+            await process_email_confirmation(callback_query, state)
         elif command == "analyse_job_item":
             await job_analyse_handler(callback_query, state)
         elif command == "add_job_url":
@@ -161,6 +180,8 @@ async def handle_callback(callback_query: CallbackQuery, state: FSMContext):
             await process_adding_job_priority(callback_query, state)
         elif command == "add_job_additional_info":
             await job_additional_info_handler(callback_query, state)
+        elif command == "add_job_ai_summary":
+            await job_ai_summary_handler(callback_query, state)
         elif command == "finish_adding_job":
             await finish_adding_job(callback_query, state)
         elif command == "get_job_item":

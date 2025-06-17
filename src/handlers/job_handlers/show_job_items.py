@@ -24,8 +24,8 @@ async def show_job_items(callback: CallbackQuery):
             job_items = result.scalars().all()
 
             if not job_items:
-                await callback.message.answer(
-                    "You don't have any job applications yet.\n"
+                await callback.message.edit_caption(
+                    caption="You don't have any job applications yet.\n"
                 )
                 return
             
@@ -49,6 +49,6 @@ async def show_job_items(callback: CallbackQuery):
 
         except Exception as e:
             logger.error(f"Error showing job items: {str(e)}")
-            await callback.message.answer(
-                "Sorry, there was an error loading your job applications. Please try again later."
+            await callback.message.edit_caption(
+                caption="Sorry, there was an error loading your job applications. Please try again later."
             )

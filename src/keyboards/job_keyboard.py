@@ -1,13 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
-def get_initial_job_keyboard():
-    """Initial keyboard for adding a job URL"""
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🔗 Add Job URL", callback_data="add_job_url")],
-        [InlineKeyboardButton(text="⬅️ Back to Main Menu", callback_data="main_menu")],
-    ])
-    return keyboard
 
 
 def get_job_metadata_keyboard():

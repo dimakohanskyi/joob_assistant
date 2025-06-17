@@ -16,13 +16,9 @@ logger = logging.getLogger(__name__)
 
 
 
-
-
 def get_temp_file_path(file_type: str) -> str:
     temp_dir = tempfile.gettempdir()
     return os.path.join(temp_dir, f'job_items_{datetime.now().strftime("%Y%m%d_%H%M%S")}.{file_type}')
-
-
 
 
 def generate_excel_report(job_items) -> str:
@@ -59,10 +55,6 @@ def generate_excel_report(job_items) -> str:
     except Exception as e:
         logger.error(f"Error creating Excel file: {str(e)}")
         raise
-
-
-
-
 
 
 def generate_pdf_report(job_items) -> str:
@@ -171,3 +163,17 @@ def generate_pdf_report(job_items) -> str:
     except Exception as e:
         logger.error(f"Error creating PDF file: {str(e)}")
         raise
+
+
+def pack_job_analyse_report(data: str):
+    try:
+        file_path = get_temp_file_path("txt")
+        with open(file_path, "w") as f:
+            f.write(data)
+        return file_path
+    except Exception as ex:
+        logger.error(f"Error creating job analysis report: {str(ex)}")
+        raise
+
+    
+

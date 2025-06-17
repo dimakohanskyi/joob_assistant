@@ -1,12 +1,13 @@
 from aiogram.types import CallbackQuery, Message
+from aiogram.fsm.context import FSMContext
+import logging
+
 from src.databese.models import User, Profile
 from src.databese.settings import get_db
 from src.settings.logging_config import configure_logging
-import logging
-from sqlalchemy import select
 from src.keyboards.profile_keyboard import get_create_profile_keyboard, get_experience_confirmation_keyboard
 from src.states.profile_states.experience_state import ExperienceState
-from aiogram.fsm.context import FSMContext
+
 
 
 
