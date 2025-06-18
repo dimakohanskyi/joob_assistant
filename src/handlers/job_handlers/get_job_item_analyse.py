@@ -9,6 +9,7 @@ from src.states.job_states.job_analyse_state import JobAnalyseState
 from src.settings.logging_config import configure_logging
 from src.utils.valid_url_checker import is_valid_url
 from src.utils.report_generator import pack_job_analyse_report
+from src.rate_limit.ai_summaty_rate_limit import check_job_item_limit
 
 
 
@@ -36,6 +37,17 @@ async def process_job_url(message: Message, state: FSMContext):
     
     state_data = await state.get_data()
     last_bot_message_id = state_data.get('last_bot_message')
+
+    can_process = await check_job_item_limit(message.from_user.id)
+    if not can_process:
+        await message.bot.edit_message_caption(
+            chat_id=message.chat.id,
+            message_id=last_bot_message_id,
+            caption="⏰ Rate limit exceeded. Please wait 60 seconds before requesting another job analysis.",
+            reply_markup=get_profile_keyboard()
+        )
+        return
+
     
     if not is_valid_url(url):
         await message.bot.edit_message_caption(

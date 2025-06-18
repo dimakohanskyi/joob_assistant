@@ -41,12 +41,6 @@ Additional features:
 - 📝 Notes  
 - 🔗 Related links (emails, chats, etc.)
 
-### 📄 Resume Templates  
-Create and save multiple CV versions — e.g. for:
-- Frontend  
-- Backend  
-- Fullstack  
-The bot will automatically choose the best template for each vacancy.
 
 ### 📊 Job Hunt Organizer  
 Smart tracking of your search activity:
@@ -56,7 +50,6 @@ Smart tracking of your search activity:
 - General stats and links overview
 
 ---
-
 
 
 ---

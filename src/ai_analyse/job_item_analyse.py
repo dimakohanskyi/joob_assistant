@@ -1,25 +1,27 @@
 from openai import OpenAI
-from dotenv import load_dotenv
-import os
 import requests
-from bs4 import BeautifulSoup
-from src.settings.logging_config import configure_logging
 import logging
+from bs4 import BeautifulSoup
+
+from src.settings.logging_config import configure_logging
+from src.settings.config import OPEN_AI_KEY
 
 
 configure_logging()
 logger = logging.getLogger(__name__)
 
 
-load_dotenv()
-OPEN_AI_KEY = os.getenv("OPEN_AI_KEY")
 client = OpenAI(api_key=OPEN_AI_KEY)
-
 
 
 async def analyse_job_url(job_url: str):
 
-    prompt = "You are an expert career assistant designed to help job seekers by summarizing job descriptions accurately and concisely. Your task is to take a provided job description and create a short, structured summary that captures all critical information. The summary must include:"
+    prompt = (
+        "You are an expert career assistant designed to help job seekers by "
+        "summarizing job descriptions accurately and concisely. Your task is "
+        "to take a provided job description and create a short, structured "
+        "summary that captures all critical information. The summary must include:"
+    )
     
     try:
         response = requests.get(job_url)  

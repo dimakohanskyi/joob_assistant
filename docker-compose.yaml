@@ -31,6 +31,22 @@ services:
 
 
 
+  redis:
+    image: redis:7-alpine
+    container_name: tg_bot_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - tg_jobb_bot_network
+    env_file:
+      - .env
+
+
+    
+
+
+
 volumes: 
   postgres_data:
 

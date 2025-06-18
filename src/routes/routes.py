@@ -30,7 +30,8 @@ from src.handlers.job_handlers.get_update_job_handler import (
     get_update_job_handler,
     get_job_item_info_handler,
     update_job_item_handler,
-    process_get_job_item_info
+    process_get_job_item_info,
+    process_update_job_item_info
 )
 from src.handlers.job_handlers.job_ai_summary_handler import job_ai_summary_handler
 
@@ -115,6 +116,11 @@ router.message.register(
 router.message.register(
     process_get_job_item_info,
     StateFilter(JobGetUpdateState.waiting_for_item_id)
+)
+
+router.message.register(
+    process_update_job_item_info,
+    StateFilter(JobGetUpdateState.waiting_for_update_item_id)
 )
 
 @router.callback_query()
