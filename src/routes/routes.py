@@ -34,6 +34,8 @@ from src.handlers.job_handlers.get_update_job_handler import (
     process_update_job_item_info
 )
 from src.handlers.job_handlers.job_ai_summary_handler import job_ai_summary_handler
+from src.handlers.cover_letter_handlers.cover_letter_handler import cover_letter_handler, process_creting_cover_letter
+
 
 from src.handlers.menu_handler import main_menu_handler
 
@@ -49,6 +51,7 @@ from src.states.profile_states.email_state import EmailState
 from src.states.job_states.job_analyse_state import JobAnalyseState
 from src.states.job_states.job_item_url_state import JobUrlState
 from src.states.job_states.job_get_update_state import JobGetUpdateState
+from src.states.cover_lettter_states.cover_letter_state import CoverLetterState
 
 
 configure_logging()
@@ -123,6 +126,14 @@ router.message.register(
     StateFilter(JobGetUpdateState.waiting_for_update_item_id)
 )
 
+router.message.register(
+    process_creting_cover_letter,
+    StateFilter(CoverLetterState.waiting_for_job_item_id)
+)
+
+
+
+
 @router.callback_query()
 async def handle_callback(callback_query: CallbackQuery, state: FSMContext):
     command = callback_query.data
@@ -196,8 +207,12 @@ async def handle_callback(callback_query: CallbackQuery, state: FSMContext):
             await get_job_item_info_handler(callback_query, state)
         elif command == "update_job_item":
             await update_job_item_handler(callback_query, state)
+        elif command == "create_cover_letter":
+            await cover_letter_handler(callback_query, state)
 
     except Exception as ex:
         logger.error(f"Error executing command - {command}")
         logger.error(str(ex))
         await callback_query.message.answer("❌ An error occurred. Please try again.")
+
+

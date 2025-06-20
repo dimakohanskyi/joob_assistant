@@ -1,12 +1,14 @@
 from aiogram.types import CallbackQuery, Message
+from aiogram.fsm.context import FSMContext
+import logging
+
 from src.databese.models import User, Profile
 from src.databese.settings import get_db
 from src.settings.logging_config import configure_logging
-import logging
-from sqlalchemy import select
 from src.keyboards.profile_keyboard import get_create_profile_keyboard, get_projects_confirmation_keyboard
 from src.states.profile_states.projects_state import ProjectsState
-from aiogram.fsm.context import FSMContext
+
+
 
 
 
@@ -106,7 +108,6 @@ async def process_adding_projects(message: Message, state: FSMContext):
         state_data = await state.get_data()
         last_bot_message_id = state_data.get('last_bot_message')
         
-        # Delete user's message
         await message.delete()
         
         projects = message.text.strip()

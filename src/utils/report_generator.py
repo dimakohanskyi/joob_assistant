@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 def get_temp_file_path(file_type: str) -> str:
     temp_dir = tempfile.gettempdir()
-    return os.path.join(temp_dir, f'job_items_{datetime.now().strftime("%Y%m%d_%H%M%S")}.{file_type}')
+    return os.path.join(temp_dir, f'temp_file_{datetime.now().strftime("%Y%m%d_%H%M%S")}.{file_type}')
 
 
 def generate_excel_report(job_items) -> str:

@@ -4,7 +4,7 @@ from src.settings.logging_config import configure_logging
 import logging
 from src.databese.models import User
 from src.databese.settings import get_db
-from sqlalchemy import select
+from aiogram.fsm.context import FSMContext
 
 
 configure_logging()
@@ -13,7 +13,12 @@ logger = logging.getLogger(__name__)
 
 
 
-async def start_handler(message: Message):
+async def start_handler(message: Message, state: FSMContext):
+    # Debug: Show last_bot_message value
+    state_data = await state.get_data()
+    last_bot_message_id = state_data.get('last_bot_message')
+    await message.answer(f"last_bot_message: {last_bot_message_id}")
+    
     bot_images_path = "media/images/joob_assistent_logo.png"
 
     base_caption = (
